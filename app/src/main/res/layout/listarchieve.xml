@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+   <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="34dp"
+       tools:ignore="MissingConstraints">
+
+
+       <ImageView
+        android:id="@+id/immageVideo"
+        android:layout_width="47dp"
+        android:layout_height="69dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/red_circle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.024"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteY="23dp" />
+
+       <TextView
+           android:id="@+id/textData"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:gravity="center"
+           android:text="05/03/2018"
+           android:textSize="21dp"
+           android:textAlignment="center"
+           android:textColor="@color/white"
+           android:textStyle="bold"
+           tools:layout_editor_absoluteX="16dp"
+           tools:layout_editor_absoluteY="36dp" />
+
+
+       <TextView
+           android:id="@+id/textDurata"
+           android:textColor="@color/white"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:paddingLeft="10dp"
+           android:paddingTop="10dp"
+           android:text="00:15"
+           android:textAlignment="center"
+           android:textSize="21sp"
+           android:textStyle="bold"
+           tools:layout_editor_absoluteX="384dp"
+           tools:layout_editor_absoluteY="92dp" />
+
+   </LinearLayout>
+
+
+</android.support.constraint.ConstraintLayout>
+

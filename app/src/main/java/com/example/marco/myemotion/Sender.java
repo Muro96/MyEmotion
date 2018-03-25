@@ -12,26 +12,34 @@ import java.net.Socket;
  * Created by marco on 02/03/18.
  */
 
-public class Sender extends AsyncTask<String,Void,Void> {
+public class Sender implements Runnable {
+
+    private String COMMAND;
     Socket socket;
-    DataOutputStream data;
     PrintWriter pw;
 
-    @Override
-    protected Void doInBackground(String... voids) {
+    public Sender(String COMMAND) {
+        this.COMMAND = COMMAND;
+    }
 
-        String message = voids[0];
+    public String getCOMMAND(){
+        return COMMAND;
+    }
+
+    @Override
+    public void run() {
+
         try {
-            socket = new Socket("192.168.4.13",9999);
+            socket = new Socket("192.168.4.1",9999);
             pw = new PrintWriter(socket.getOutputStream());
-            pw.write(message);
+            pw.write(COMMAND);
             pw.flush();
+            Log.d("sto inviando","yes");
             pw.close();
             socket.close();
         } catch (IOException e) {
             Log.d("doInBackground","error to create the socket");
         }
-        return null;
     }
 
 }
