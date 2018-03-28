@@ -1,9 +1,8 @@
 package com.example.marco.myemotion;
 
 import android.os.AsyncTask;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -12,33 +11,32 @@ import java.net.Socket;
  * Created by marco on 02/03/18.
  */
 
-public class Sender implements Runnable {
+public class Sender extends AppCompatActivity implements Runnable   {
 
-    private String COMMAND;
-    Socket socket;
-    PrintWriter pw;
+    private String ip;
+    private int port;
+    private String command;
 
-    public Sender(String COMMAND) {
-        this.COMMAND = COMMAND;
-    }
-
-    public String getCOMMAND(){
-        return COMMAND;
+    public Sender(String ip, int port, String command) {
+        this.ip = ip;
+        this.port = port;
+        this.command = command;
     }
 
     @Override
     public void run() {
-
         try {
-            socket = new Socket("192.168.4.1",9999);
-            pw = new PrintWriter(socket.getOutputStream());
-            pw.write(COMMAND);
-            pw.flush();
-            Log.d("sto inviando","yes");
-            pw.close();
-            socket.close();
+            Socket sc;
+            PrintWriter ps;
+            sc = new Socket(ip, port);
+            ps = new PrintWriter(sc.getOutputStream(), true);
+            ps.println(command);
+            ps.flush();
+            ps.close();
+            sc.close();
         } catch (IOException e) {
-            Log.d("doInBackground","error to create the socket");
+            e.printStackTrace();
+
         }
     }
 

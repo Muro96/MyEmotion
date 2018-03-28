@@ -1,43 +1,40 @@
 package com.example.marco.myemotion;
 
-import android.app.Fragment;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothProfile;
-import android.bluetooth.BluetoothServerSocket;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.net.wifi.ScanResult;
-import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.Socket;
-import java.util.List;
-import java.util.Set;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    public Context context;
-    public static DBmanager manager;
-    public Sessione s;
+    private static Context context;
+    private static DBmanager manager;
+    private String TAG = "ERROR_MAINACT";
 
+    public static ArrayList<Sessione> sessioni = new ArrayList<>();
 
+    public final static int PACKET_SIZE = 8192;
+    public final static int com = 9999; // Porta per l'invio dei comandi
+    public final static int recport = 9000; // Porta per la ricezione dei dati
+    //public final static String extIP = "192.168.1.156"; //Home IP
+    public static String extIP = "192.168.4.1"; // WiFi direct IP
+
+    public static Context getContext() {
+        return context;
+    }
+
+    /**
+     * Navigazione per il menù alla base
+     */
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -66,36 +63,17 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        manager = new DBmanager(this);
-        try {
-            manager.getDbhelper().add(s);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        // enableWifi();
-
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        Home fragment = new Home();
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.content, fragment);
-        transaction.commit();
-    }
-
-
+    /**
+     * Permette di abilitare il wifi
+     */
     public void enableWifi() {
-        Intent intent = new Intent(Intent.ACTION_MAIN,null);
+        Intent intent = new Intent(Intent.ACTION_MAIN, null);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
-        ComponentName cn = new ComponentName("com.android.settings","com.android.settings.wifi.WifiSettings");
+        ComponentName cn = new ComponentName("com.android.settings", "com.android.settings.wifi.WifiSettings");
         intent.setComponent(cn);
         //intent.setFlags(intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
-        /*WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         if (wifiManager.isWifiEnabled()) {
             Toast.makeText(getBaseContext(), "Wifi already enabled", Toast.LENGTH_LONG).show();
         } else {
@@ -103,11 +81,25 @@ public class MainActivity extends AppCompatActivity {
             // wifiConfiguration.SSID = "\"".concat("VeniceConnected").concat("\"");
             //int netId = wifiManager.addNetwork(wifiConfiguration);
             // boolean wifiEnabled = wifiManager.enableNetwork(netId, true);
-            wifiManager.setWifiEnabled(true); */
-
+            wifiManager.setWifiEnabled(true);
 
         }
-
     }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        Home fragment = new Home();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.content, fragment);
+        transaction.commit();
+
+        // Faccio partire il Thread che aspetta di ricevere il video con i file dati
+        new Thread(new Reciver(recport, getApplicationContext())).start();
+    }
+}
 
 

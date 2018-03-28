@@ -5,46 +5,34 @@ package com.example.marco.myemotion;
  */
 
 public class Registrazione  {
-    private double x;
-    private double y;
-    private long timestamp;
+    private String x;
+    private String y;
+    private String timestamp;
 
-    public Registrazione(double x, double y, long timestamp) {
+    public Registrazione(String x, String y, String timestamp) {
         this.x = x;
         this.y = y;
         this.timestamp = timestamp;
     }
 
-    public double getX() {
+    public String getX() {
         return x;
     }
 
-    public void setX(double x) {
-        this.x = x;
-    }
-
-    public double getY() {
+    public String getY() {
         return y;
     }
 
-    public void setY(double y) {
-        this.y = y;
-    }
-
-    public long getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
-    }
-
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
     }
 
     @Override
     public String toString() {
         return "Registrazione{" +
-                "x=" + x +
-                ", y=" + y +
-                ", timestamp=" + timestamp +
+                "x='" + x + '\'' +
+                ", y='" + y + '\'' +
+                ", timestamp='" + timestamp + '\'' +
                 '}';
     }
 }

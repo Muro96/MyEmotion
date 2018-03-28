@@ -1,68 +1,97 @@
 package com.example.marco.myemotion;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Environment;
-import android.provider.MediaStore;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
+import java.sql.Time;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * Created by marco on 05/03/18.
  */
 
-public class Reciver extends AppCompatActivity implements Runnable {
-    private int upPort = 0;
-    @Override
-    public void run() {
-        while (true) {
-            try {
-                int count, i;
-                Date currentTime = Calendar.getInstance().getTime();
-                Socket sc = new ServerSocket(9000 + upPort).accept();
-                upPort++;
+public class Reciver implements Runnable {
 
+    public final static String FOLDER = "MyEmotionVideo";
+    private final String CAMERA_BASE_NAME = "mpu_camera.mp4";
+    private final String MPU_BASE_NAME = "mpu_data.txt";
+    private final String TAG_ERR = "Errore";
 
-                sc.setReuseAddress(true);
+    private int PORTOUT;
+    private Context ctx;
+    private String path_video = "";
+    private String path_dati = "";
 
-                //Where save file received
-                FileOutputStream out = new FileOutputStream("mpu_camera.h264");
-
-
-                //Where read data
-                DataInputStream in = new DataInputStream(new BufferedInputStream(sc.getInputStream()));
-
-                byte[] buffer = new byte[8192]; // or 4096, or more
-                i = 0;
-
-                while ((count = in.read(buffer)) > 0) {
-                    out.write(buffer, 0, count);
-                    Log.i("Info", i++ + " - Letto dal buffer"+buffer+" #bytes: " + count);
-                }
-
-              //  out.close();
-                in.close();
-                sc.close();
-
-            } catch (IOException ex) {
-                Log.e("Error", "Errore durante la creazione del socket di ricezione."+ex);
-            }
-        }
+    public Reciver(int port, Context ctx) {
+        this.PORTOUT = port;
+        this.ctx = ctx;
     }
 
+    @Override
+    public void run() {
+        Socket sc = null; // Socket dove aspettare le connessioni
+        ServerSocket ssc; // Socket che fa da server sempre attivo
+        String moment;
+        File folder;
+        String path;
 
+        try {
+            //Creo la mia dir
+            //folder = ctx.getDir("", Context.MODE_PRIVATE);
+            folder = new File(Environment.getExternalStorageDirectory(), FOLDER);
+            if(!folder.exists()) Log.e(TAG_ERR, "" + folder.mkdir());
+            else Log.e(TAG_ERR, "La cartella esiste!");
+            // Inizializzo il socket per le connessioni in ingresso su quella porta
+            ssc = new ServerSocket(PORTOUT);
+            //Supporta fino a 100 connessioni (messo a caso per farlo andare)
+            for (int j = 0; j < 100; j++) {
+                moment = getTodayDate();
+                // Video
+                sc = ssc.accept();
+                sc.setReuseAddress(true);
+                path_video = moment + "_" + CAMERA_BASE_NAME;
+                path_video = path_video.replace(" ", "_");
+                new ArchiviaFile(path_video, sc.getInputStream(), ctx).run();
+
+                // File dati
+                sc = ssc.accept();
+                path_dati = moment + "_" + MPU_BASE_NAME;
+                path_dati = path_dati.replace(" ", "_");
+                new ArchiviaFile(path_dati, sc.getInputStream(), ctx).run();
+
+                // Faccio partire il thread che caricherà i dati nel DB
+                new Thread(new Parser(path_video, path_dati, ctx)).start();
+            } // for
+
+            sc.close(); // Chiuso il socket
+            ssc.close(); // Rilascio la porta in ricezione
+        } catch (SocketException | FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            Log.e(TAG_ERR, "Problema nella ricezione");
+            e.printStackTrace();
+        }
+
+    } // run
+
+
+    private String getTodayDate() {
+        return new SimpleDateFormat("yyyyMMdd_HH-mm-ss").format(new Date());
+    }
 }

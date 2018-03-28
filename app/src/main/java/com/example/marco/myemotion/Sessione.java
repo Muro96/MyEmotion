@@ -1,8 +1,6 @@
 package com.example.marco.myemotion;
 
-import android.content.Context;
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -10,17 +8,18 @@ import java.util.ArrayList;
  * Created by marco on 15/03/18.
  */
 
-public class Sessione implements Parcelable {
-    String id_sessione;
-    Context ct;
-    String data;
-    String durata;
-    String path_video;
-    String path_file;
+public class Sessione {
+    private String index;
+    private String data;
+    private String durata;
+    private String path_video;
+    private String path_file;
     private ArrayList<Registrazione> registrazioni;
 
-    public Sessione(Context ct, String data, String durata, String path_video, String path_file, ArrayList<Registrazione> registrazioni) {
-        this.ct = ct;
+    private final String TAG = "ERROR_SESSION";
+
+    public Sessione(String index, String data, String durata, String path_video, String path_file, ArrayList<Registrazione> registrazioni) {
+        this.index = index;
         this.data = data;
         this.durata = durata;
         this.path_video = path_video;
@@ -28,87 +27,69 @@ public class Sessione implements Parcelable {
         this.registrazioni = registrazioni;
     }
 
-    public Sessione(String id_sessione, String data, String durata, String path_video, String path_file) {
-        this.id_sessione=id_sessione;
-        this.data=data;
-        this.durata=durata;
-        this.path_video=path_video;
-        this.path_file=path_file;
-
+    public Sessione(String data, String durata, String path_video, String path_file, ArrayList<Registrazione> registrazioni) {
+        this.data = data;
+        this.durata = durata;
+        this.path_video = path_video;
+        this.path_file = path_file;
+        this.registrazioni = registrazioni;
+        this.index = "empty";
     }
 
-
-
-    @Override
-    public String toString() {
-        return id_sessione+" "+data+" "+durata+" "+path_video+" "+path_file+" ";
-
-
+    public String getIndex() {
+        return index;
     }
 
-    /**
-     *
-     * @param in Cosa che passa oggetti tra activity
-     */
-    public Sessione(Parcel in) {
-        String[] data = new String[5];
-        in.readStringArray(data);
-        this.id_sessione=data[0];
-        this.data=data[1];
-        this.durata=data[2];
-        this.path_video=data[3];
-        this.path_file=data[4];
+    public String getData() {
+        return data;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public String getDurata() {
+        return durata;
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-
-        parcel.writeStringArray(new String[]{
-                this.id_sessione,
-                this.data,
-                this.durata,
-                this.path_video,
-                this.path_file
-
-        });
-
+    public String getPath_video() {
+        return path_video;
     }
 
-    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+    public String getPath_file() {
+        return path_file;
+    }
 
-        @Override
-        public Sessione createFromParcel(Parcel parcel) {
-            return new Sessione(parcel);
-        }
+    public ArrayList<Registrazione> getRegistrazioni() {
+        return registrazioni;
+    }
 
-        @Override
-        public Object[] newArray(int i) {
-            return new Sessione[i];
-        }
-    };
-
-    public void upload() {
-        DBHelper dbh = new DBHelper(ct);
+    public boolean upload() {
+        DBHelper dbh = new DBHelper(MainActivity.getContext());
         String interr;
-        // Inserimento dati sessione data, durata, path_video, path_file
-        interr = "INSERT INT Sessioni(data,..) VALUES('";
+        String id = "0";
 
-        //esegui query
+        try {
+            interr = "INSERT INTO Sessione(data, durata, path_video, path_mpu) " +
+                    "VALUES('" + getData() + "', '" + getDurata() + "', '" + getPath_video() + "', '" + getPath_file() + "')";
 
-        //GET INDICE DELLA SESSIONE
-
-        interr = "INSERT INTO REGISTRAZIONI(VAL1, VAL2, FK_SESSIONE";
+            //Eseguo query
 
 
+            //Prendo l'index generato
+
+            for(Registrazione t : registrazioni) {
+                interr = "INSERT INTO Registrazioni(x, y, time_stamp, fk_sessione) " +
+                        "VALUES(" + cleaned(t.getX()) + ", " + cleaned(t.getY()) + ", " + cleaned(t.getTimestamp()) + ", " + id + ")";
+                //Inserisco nel db le varie registrazioni linkate alla sessione attuale
+            }
+        } catch(Exception e) {
+            Log.e(TAG, "SQLite issues");
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
     }
 
     private String cleaned(String s) {
-        return s.replace(",", ".");
+        return (s.replace(",", "."));
     }
 
 }
