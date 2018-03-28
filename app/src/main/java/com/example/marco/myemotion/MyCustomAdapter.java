@@ -70,4 +70,3 @@ public class MyCustomAdapter extends ArrayAdapter<Sessione> {
     }
 
 }
-

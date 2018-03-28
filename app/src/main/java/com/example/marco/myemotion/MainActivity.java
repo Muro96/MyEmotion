@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static ArrayList<Sessione> sessioni = new ArrayList<>();
 
-    public final static int PACKET_SIZE = 8192;
+    public final static int PACKET_SIZE = 512;
     public final static int com = 9999; // Porta per l'invio dei comandi
     public final static int recport = 9000; // Porta per la ricezione dei dati
     //public final static String extIP = "192.168.1.156"; //Home IP

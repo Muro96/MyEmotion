@@ -29,7 +29,7 @@ import java.util.TimeZone;
 public class Reciver implements Runnable {
 
     public final static String FOLDER = "MyEmotionVideo";
-    private final String CAMERA_BASE_NAME = "mpu_camera.mp4";
+    private final String CAMERA_BASE_NAME = "mpu_camera.h264";
     private final String MPU_BASE_NAME = "mpu_data.txt";
     private final String TAG_ERR = "Errore";
 

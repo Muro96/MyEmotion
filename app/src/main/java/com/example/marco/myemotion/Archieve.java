@@ -21,6 +21,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.marco.myemotion.MainActivity.getContext;
+
 public class Archieve extends Fragment {
     private View view;
     private ListView list;
@@ -36,7 +38,7 @@ public class Archieve extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(Archieve.this.getActivity(),VideoInfo.class);
-                intent.putExtra("videoInfo",videolist.get(position));
+                intent.putExtra("videoInfo", (Parcelable) videolist.get(position));
                 startActivity(intent);
             }
         });

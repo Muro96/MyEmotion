@@ -88,11 +88,9 @@ public class VideoInfo extends AppCompatActivity {
             }
         };
         listinfo.setAdapter(adapter);
-
-
+        
     }
 }
-
 
 
 
