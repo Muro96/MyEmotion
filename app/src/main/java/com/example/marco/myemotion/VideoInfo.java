@@ -3,20 +3,26 @@ package com.example.marco.myemotion;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.PersistableBundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.MediaController;
+import android.widget.TextView;
 import android.widget.VideoView;
 
 import java.io.File;
@@ -35,8 +41,7 @@ public class VideoInfo extends AppCompatActivity {
     private ListView listinfo;
     private VideoView video;
     private MediaController mediaController;
-    String[] f;
-    ArrayList<String> arrayFile = new ArrayList<>();
+    ArrayList<String> videoList = new ArrayList<>();
 
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -59,43 +64,35 @@ public class VideoInfo extends AppCompatActivity {
         video.requestFocus();
         video.start();
 
-        int i;
+        Sessione sessione = (Sessione) getIntent().getParcelableExtra("videoInfo");
+        videoList.add("Data : " + sessione.getData());
+        videoList.add("Durata : €" + sessione.getDurata());
 
-        AssetManager assetManager = getResources().getAssets();
-        try {
-            f = assetManager.list("");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (f == null) {
-            Log.e("directory empty!", "");
-        } else {
-            for (i = 0; i < f.length; i++) {
-                if (f[i].contains(".mp4")) {
-                    Log.e("asdfgh", "" + f[i]);
-                }
+
+        ListAdapter adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_2, android.R.id.text1, videoList) {
+            @NonNull
+            @Override
+            public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+
+                TextView text1 = (TextView) view.findViewById(android.R.id.text1);
+                text1.setTypeface(null, Typeface.BOLD);
+
+                TextView text2 = (TextView) view.findViewById(android.R.id.text2);
+
+                text1.setText(videoList.get(position).substring(0, videoList.get(position).indexOf(":")));
+
+                text2.setText(videoList.get(position).substring(videoList.get(position).indexOf(":") + 1, videoList.get(position).length()));
+
+                return view;
             }
-        }
-
-
-
-
-      /*  try {
-            int i;
-            int count;
-            byte[] buffer = new byte[4096]; // or 4096, or more
-            i = 0;
-
-
-            while ((count = inputStream.read(buffer)) > 0) {
-                Log.e("sdfj",""+inputStream.read(buffer));
-                Log.i("Info", i++ + " - Letto dal buffer"+buffer+" #bytes: " + count);
-
-            } */
+        };
+        listinfo.setAdapter(adapter);
 
 
     }
 }
+
 
 
 

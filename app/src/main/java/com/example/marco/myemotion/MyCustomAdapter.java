@@ -14,15 +14,16 @@ import java.util.List;
  * Created by marco on 05/03/18.
  */
 
-public class MyCustomAdapter extends ArrayAdapter {
+public class MyCustomAdapter extends ArrayAdapter<Sessione> {
     private  static final String TAG = "MyCustomAdapter";
     private Context ct;
     private int textViewResourceId;
+    private List<Sessione> sessioneList;
 
 
 
-    public MyCustomAdapter(Context ct, int textViewResourceId, List sessione) {
-        super(ct, textViewResourceId,sessione);
+    public MyCustomAdapter(Context ct, int textViewResourceId, List<Sessione> sessioneList) {
+        super(ct, textViewResourceId,sessioneList);
         this.ct = ct;
         this.textViewResourceId=textViewResourceId;
 
@@ -40,6 +41,8 @@ public class MyCustomAdapter extends ArrayAdapter {
     @NonNull
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
+        String data = getItem(position).getData();
+        String durata = getItem(position).getDurata();
 
         ViewHolder holder;
         final View result;

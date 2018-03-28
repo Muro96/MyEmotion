@@ -40,12 +40,13 @@ public class Sessione {
         return index;
     }
 
-    public String getData() {
-        return data;
-    }
 
-    public String getDurata() {
-        return durata;
+
+    @Override
+    public String toString() {
+        return id_sessione+" "+data+" "+durata+" "+path_video+" "+path_file+" ";
+
+
     }
 
     public String getPath_video() {
