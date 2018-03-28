@@ -24,14 +24,13 @@ import java.util.List;
 public class Archieve extends Fragment {
     private View view;
     private ListView list;
-    private ArrayList<String> videolist = new ArrayList<>();
+    private ArrayList<Sessione> videolist = new ArrayList<>();
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_archieve,container, false);
         list = (ListView) view.findViewById(R.id.archievelist);
-        videolist.add("ciao");
         populateList();
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
